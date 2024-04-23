@@ -14,24 +14,24 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "customer")
-public class Customer {
+@Table(name="orders")
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
-    private String description;
-    private LocalDate dateAdded;
+    private LocalDate dateOfOrder;
+    private LocalDate dateOfLastChange;
+    private int totalPrice;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "order")
     @JsonManagedReference
-    private List<Order> orders;
+    private List<Product> products;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Payment> payments;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    @JsonIgnore
+    private Customer customer;
+
 
 }
