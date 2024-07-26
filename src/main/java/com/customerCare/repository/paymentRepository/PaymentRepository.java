@@ -1,4 +1,4 @@
-package com.customerCare.repository;
+package com.customerCare.repository.paymentRepository;
 
 import com.customerCare.model.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;

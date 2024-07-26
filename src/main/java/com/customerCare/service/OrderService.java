@@ -1,10 +1,15 @@
 package com.customerCare.service;
 
+import com.customerCare.dto.CustomerDto;
 import com.customerCare.dto.OrderDto;
+import com.customerCare.dto.ProductDto;
+import com.customerCare.dtoMapper.CustomerDtoMapper;
+import com.customerCare.dtoMapper.ProductDtoMapper;
 import com.customerCare.model.Customer;
 import com.customerCare.model.Order;
 import com.customerCare.model.Product;
-import com.customerCare.repository.OrderRepository;
+import com.customerCare.repository.customerRepository.CustomerRepository;
+import com.customerCare.repository.orderRepository.OrderRepository;
 import com.customerCare.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,11 +27,14 @@ public class OrderService {
     OrderRepository orderRepository;
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    CustomerRepository customerRepository;
 
-    public Order addOrder(List<Product> products, long customerId) {
+    public OrderDto addOrder(List<ProductDto> productsDto, long customerId) {
 
         int totalPrice = 0;
         int pricePerProduct = 0;
+        List<Product> products = ProductDtoMapper.productsDtoToProducts(productsDto);
 
         for(Product product : products) {
             pricePerProduct = product.getPrice()  * product.getAmount();
@@ -35,13 +43,18 @@ public class OrderService {
 
         Order order = new Order();
         LocalDate date = LocalDate.now();
-        Customer customer = customerService.getCustomerById(customerId);
+
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if (optionalCustomer.isPresent()) {
+            optionalCustomer.get().setDebt();
+            customerRepository.save(optionalCustomer.get());
+        }
 
         order.setDateOfOrder(date);
         order.setDateOfLastChange(date);
         order.setProducts(products);
         order.setTotalPrice(totalPrice);
-        order.setCustomer(customer);
+        order.setCustomer(optionalCustomer.get());
 
         Order addedOrder = orderRepository.save(order);
 
@@ -51,8 +64,14 @@ public class OrderService {
 
         productRepository.saveAll(products);
 
-        return addedOrder;
+        OrderDto orderDto = new OrderDto();
+        orderDto.setCustomerId(customerId);
+        orderDto.setId(order.getId());
+        orderDto.setProducts(productsDto);
+        orderDto.setTotalPrice(order.getTotalPrice());
+        orderDto.setDateOfOrder(order.getDateOfOrder());
 
+        return orderDto;
     }
 
     public OrderDto editOrder(Order newOrder, long orderId) {
@@ -72,10 +91,7 @@ public class OrderService {
 
             OrderDto orderDto = new OrderDto();
             orderDto.setId(order.getId());
-            orderDto.setProducts(order.getProducts());
             orderDto.setTotalPrice(order.getTotalPrice());
-            orderDto.setCustomerFirstName(order.getCustomer().getFirstName());
-            orderDto.setCustomerLastName(order.getCustomer().getLastName());
 
             return orderDto;
         } else {
@@ -89,9 +105,7 @@ public class OrderService {
         int totalPrice = 0;
 
         for(Product product : products) {
-
             totalPrice+=product.getPrice();
-
         }
 
         return totalPrice;

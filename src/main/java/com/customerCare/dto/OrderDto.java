@@ -1,22 +1,31 @@
 package com.customerCare.dto;
-import com.customerCare.model.Product;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrderDto {
 
     private long id;
-    private List<Product> products;
+    private LocalDate dateOfOrder;
+    private LocalDate dateOfLastChange;
     private int totalPrice;
-    private String customerFirstName;
-    private String customerLastName;
+    private List<ProductDto> products;
+    private long customerId;
+
+    public OrderDto(long id, LocalDate dateOfOrder, LocalDate dateOfLastChange, int totalPrice) {
+        this.id = id;
+        this.dateOfOrder = dateOfOrder;
+        this.dateOfLastChange = dateOfLastChange;
+        this.totalPrice = totalPrice;
+    }
 
 }

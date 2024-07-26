@@ -33,5 +33,4 @@ public class Order {
     @JsonIgnore
     private Customer customer;
 
-
 }

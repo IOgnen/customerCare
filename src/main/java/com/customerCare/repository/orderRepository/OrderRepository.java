@@ -1,4 +1,4 @@
-package com.customerCare.repository;
+package com.customerCare.repository.orderRepository;
 
 import com.customerCare.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
